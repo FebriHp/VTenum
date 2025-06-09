@@ -32,6 +32,9 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
+## 💻 Usage
+Start your Telegram bot by clicking Start or sending the /start command. After that, input the domain you wish to scan
+
 ## 📌 Notes
 
 Edit your TELEGRAM_TOKEN and VT_API_KEY in main.py.
