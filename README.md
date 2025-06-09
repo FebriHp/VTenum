@@ -28,7 +28,7 @@ docker run --rm vtenum
 pip install -r requirements.txt
 python main.py
 
-## Notes
+## 📌 Notes
 
 Edit your TELEGRAM_TOKEN and VT_API_KEY in main.py.
 Make sure to replace OWNER_ID with your Telegram ID.
