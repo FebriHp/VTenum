@@ -21,11 +21,13 @@ This bot allows you to scan a domain using VirusTotal API and returns:
 ### Using Docker
 
 docker build -t vtenum .
+
 docker run --rm vtenum
 
 ### Without Docker
 
 pip install -r requirements.txt
+
 python main.py
 
 ## 📌 Notes
