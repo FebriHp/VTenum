@@ -19,17 +19,19 @@ This bot allows you to scan a domain using VirusTotal API and returns:
 ## 📦 Installation
 
 ### Using Docker
-
+```bash
 docker build -t vtenum .
-
+```
+```bash
 docker run --rm vtenum
-
+```
 ### Without Docker
-
+```bash
 pip install -r requirements.txt
-
+```
+```bash
 python main.py
-
+```
 ## 📌 Notes
 
 Edit your TELEGRAM_TOKEN and VT_API_KEY in main.py.
