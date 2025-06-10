@@ -7,9 +7,9 @@ from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
 # Configuration
 TELEGRAM_TOKEN = 'TELEBOT_Token'
 VT_API_KEY = 'Virustotal_API'
-OWNER_ID = Your_Telegram_ID  # Only this Telegram user can use the bot
+OWNER_ID = Your_Telegram_ID  
 
-# Query VirusTotal domain report
+
 def scan_domain(domain):
     url = f'https://www.virustotal.com/vtapi/v2/domain/report?apikey={VT_API_KEY}&domain={domain}'
     try:
@@ -21,17 +21,28 @@ def scan_domain(domain):
     except Exception as e:
         return [], []
 
-# Format undetected URLs
-def format_urls(urls):
-    return '\n'.join([u[0] for u in urls]) if urls else 'No undetected URLs found.'
 
-# Send long messages in chunks (Telegram limit is 4096 characters)
+def format_urls(urls):
+    return '\n\n'.join([f"{i+1}. {u[0]}" for i, u in enumerate(urls)]) if urls else 'No undetected URLs found.'
+
+
 def send_long_message(context: CallbackContext, chat_id: int, message: str):
     max_length = 4096
-    for i in range(0, len(message), max_length):
-        context.bot.send_message(chat_id=chat_id, text=message[i:i + max_length])
+    lines = message.split('\n\n')  
 
-# Handle incoming messages
+    current_chunk = ""
+    for line in lines:
+        line += '\n\n'
+        if len(current_chunk) + len(line) > max_length:
+            context.bot.send_message(chat_id=chat_id, text=current_chunk.strip())
+            current_chunk = line
+        else:
+            current_chunk += line
+
+    if current_chunk:
+        context.bot.send_message(chat_id=chat_id, text=current_chunk.strip())
+
+
 def handle_message(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     if user_id != OWNER_ID:
@@ -47,21 +58,21 @@ def handle_message(update: Update, context: CallbackContext):
 
     undetected, subdomains = scan_domain(domain)
     if undetected:
-        msg = f"🌐 Undetected URLs for {domain}:\n{format_urls(undetected)}"
+        msg = f"🌐 Undetected URLs for {domain}:\n\n{format_urls(undetected)}"
         send_long_message(context, update.effective_chat.id, msg)
     else:
         update.message.reply_text(f"🌐 No undetected URLs for {domain}.")
 
     for sub in subdomains:
-        time.sleep(15)  # Respect VirusTotal rate limit (max 4 req/min)
+        time.sleep(15)  # Rate limit VT: 4 permintaan/menit
         undetected_sub, _ = scan_domain(sub)
         if undetected_sub:
-            msg = f"🔗 Undetected URLs for subdomain {sub}:\n{format_urls(undetected_sub)}"
+            msg = f"🔗 Undetected URLs for subdomain {sub}:\n\n{format_urls(undetected_sub)}"
             send_long_message(context, update.effective_chat.id, msg)
 
     update.message.reply_text("✅ Done.")
 
-# Entry point
+
 def main():
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
     dp = updater.dispatcher
